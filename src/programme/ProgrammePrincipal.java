@@ -70,7 +70,7 @@ public class ProgrammePrincipal {
 		
 		FileSimplementChainee file = new FileSimplementChainee();
 		
-		System.out.println("La vide est vide?  " + file.estVide());
+		System.out.println("La File est vide?  " + file.estVide());
 		
 		file.ajouterElement(32);
 		file.ajouterElement(12);
@@ -92,7 +92,7 @@ public class ProgrammePrincipal {
 		
 		System.out.println();
 		
-		System.out.println("La vide est vide?  " + file.estVide());
+		System.out.println("La File est vide?  " + file.estVide());
 		
 	}
 	
