@@ -19,14 +19,15 @@ public class ProgrammePrincipal {
 	 * @param args, pas utilisé
 	 */
 	public static void main(String[] args){
-	
+
+		System.out.println("Test");
 		SatelliteRelai satellite = new SatelliteRelai();
 		
 		
 		CentreControle centreControle = new CentreControle(satellite);
 		Rover rover = new Rover(satellite);
-		
-		
+
+
 		satellite.start();
 	}
 	
