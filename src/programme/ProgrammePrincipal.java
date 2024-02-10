@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ListIterator;
 
 import modele.centreControle.CentreControle;
+import modele.communication.Message;
+import modele.communication.Nack;
 import modele.rover.Rover;
 import modele.satelliteRelai.SatelliteRelai;
 import utilitaires.FileSimplementChainee;
@@ -21,13 +23,9 @@ public class ProgrammePrincipal {
 	public static void main(String[] args){
 	
 		SatelliteRelai satellite = new SatelliteRelai();
+		//satellite.start();
 		
-		
-		CentreControle centreControle = new CentreControle(satellite);
-		Rover rover = new Rover(satellite);
-		
-		
-		satellite.start();
+		testFileSimplementChainee();
 	}
 	
 	/*
@@ -70,29 +68,51 @@ public class ProgrammePrincipal {
 		
 		FileSimplementChainee file = new FileSimplementChainee();
 		
-		System.out.println("La vide est vide?  " + file.estVide());
-		
-		file.ajouterElement(32);
-		file.ajouterElement(12);
-		file.ajouterElement(84);
-		file.ajouterElement(1);
-		file.ajouterElement(46);
-		
-		for (int i = 0; i < file.getFile().size(); i++) {
-			System.out.print(" " + file.getFile().get(i));
-		}
-		
-		file.enleverElement(84);
-		
-		System.out.println();
-		
-		for (int i = 0; i < file.getFile().size(); i++) {
-			System.out.print(" " + file.getFile().get(i));
-		}
-		
-		System.out.println();
+		Nack msg1 = new Nack(1);
+		Nack msg2 = new Nack(2);
+		Nack msg3 = new Nack(3);
+		Nack msg4 = new Nack(4);
+		Nack msg5 = new Nack(5);
 		
 		System.out.println("La vide est vide?  " + file.estVide());
+		System.out.println("Nombre d'element dans la file:   " + file.getNbElements());
+		System.out.println("______________________________________________________");
+		
+		System.out.println("On ajoute Message 1");
+		file.ajouterElement(msg1);
+
+		System.out.println("On ajoute Message 2");
+		file.ajouterElement(msg2);
+		
+		System.out.println("On ajoute Message 3");
+		file.ajouterElement(msg3);
+		
+		System.out.println("On ajoute Message 4");
+		file.ajouterElement(msg4);
+		
+		System.out.println("On ajoute Message 5");
+		file.ajouterElement(msg5);
+		
+		System.out.println("On enleve le premier element");
+		file.enleverElement();
+		
+		System.out.println("On enleve le premier element");
+		file.enleverElement();
+		
+		System.out.println("On enleve le premier element");
+		file.enleverElement();
+		
+		System.out.println("On enleve le premier element");
+		file.enleverElement();
+		
+		System.out.println("On enleve le premier element");
+		file.enleverElement();
+		
+		System.out.println("On ajoute Message 2");
+		file.ajouterElement(msg2);
+		
+		System.out.println("On ajoute Message 5");
+		file.ajouterElement(msg5);
 		
 	}
 	
