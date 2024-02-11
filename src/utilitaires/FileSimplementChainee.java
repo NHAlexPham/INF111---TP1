@@ -12,8 +12,6 @@ public class FileSimplementChainee {
 	private int nbElements;	// nombre d'elements dans la file
 	
 	
-	
-	
 	/*
 	 * @param file
 	 */
@@ -21,12 +19,14 @@ public class FileSimplementChainee {
 	}
 	
 	/*
-	 * retourne le dernier element de la file qui est entree
+	 * retourne le dernier element de la file
 	 */
 	public Noeud getDernier() {
 		return dernier;
 	}
-	
+	/*
+	 * retourne le premier element de la file 
+	 */
 	public Noeud getPremier() {
 		return premier;
 	}
@@ -38,6 +38,22 @@ public class FileSimplementChainee {
 		return nbElements;
 	}
 	
+	public Noeud getNoeudSuivant() {
+		return premier.suivant;
+	}
+	
+	
+	public void afficheFile(FileSimplementChainee file) {
+		
+		FileSimplementChainee fileTest = new FileSimplementChainee();
+		fileTest = file;
+		
+		while(fileTest.premier != null) { 
+			System.out.print(fileTest.premier + "-------");
+			fileTest.enleverElement();	
+		}
+		System.out.println();
+	}
 	
 	/*
 	 * @param element
@@ -65,6 +81,7 @@ public class FileSimplementChainee {
 		
 		
 		//affiche les informations importantes durant les test *****A EFFACER PLUTARD******
+		/*
 		System.out.println("---- premier            " + premier);
 		System.out.println("---- suivant du premier " + premier.suivant);
 		System.out.println("---- dernier            " + dernier);
@@ -72,7 +89,7 @@ public class FileSimplementChainee {
 		System.out.println("La file est vide?  " + estVide());
 		System.out.println("Nombre d'element dans la file:   " + nbElements);
 		System.out.println("______________________________________________________");
-		
+		*/
 		
 	}
 	
@@ -105,6 +122,7 @@ public class FileSimplementChainee {
 		
 		
 		//affiche les informations importantes durant les test *****A EFFACER PLUTARD******
+		/*
 		System.out.println("---- premier            " + premier);
 		
 		if(premier != null) {
@@ -117,7 +135,7 @@ public class FileSimplementChainee {
 		System.out.println("La file est vide?  " + estVide());
 		System.out.println("Nombre d'element dans la file:   " + nbElements);
 		System.out.println("______________________________________________________");
-		
+		*/
 	}
 	
 	/*
@@ -151,7 +169,7 @@ public class FileSimplementChainee {
 		 */
 		@Override
 		public String toString() {
-			return "Message numero: " + msg.getCompte();
+			return "Message " + msg.getCompte();
 		}
 		
 		}
