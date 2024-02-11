@@ -2,6 +2,7 @@ package programme;
 
 import java.io.IOException;
 import java.util.ListIterator;
+import java.util.Random;
 
 import modele.centreControle.CentreControle;
 import modele.communication.Message;
@@ -23,9 +24,9 @@ public class ProgrammePrincipal {
 	public static void main(String[] args){
 	
 		SatelliteRelai satellite = new SatelliteRelai();
-		//satellite.start();
+		satellite.start();
 		
-		testFileSimplementChainee();
+		testSatellite(satellite);
 	}
 	
 	/*
@@ -116,5 +117,12 @@ public class ProgrammePrincipal {
 		
 	}
 	
-	
+	public static void testSatellite(SatelliteRelai satellite) {
+		
+		for(int i = 0; i < 100; i++) {
+			Nack msg = new Nack(i);
+			satellite.envoyerMessageVersRover(msg);
+			
+		}
+	}
 }
