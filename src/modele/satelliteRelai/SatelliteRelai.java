@@ -26,34 +26,22 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
-import modele.centreControle.CentreControle;
 import modele.communication.Message;
-import modele.rover.Rover;
+import utilitaires.FileSimplementChainee;
 
 public class SatelliteRelai extends Thread{
 	
 	static final int TEMPS_CYCLE_MS = 500;
 	static final double PROBABILITE_PERTE_MESSAGE = 0.15;
 	
-	private ArrayList<Double> destRover = new ArrayList<>();
-	private ArrayList<Double> destCentreControle = new ArrayList<>();
-	
-	private CentreControle centreControle;
-	private Rover rover;
-	
 	ReentrantLock lock = new ReentrantLock();
 	
 	private Random rand = new Random();
 	
+	FileSimplementChainee destRover = new FileSimplementChainee();
+	FileSimplementChainee destCentreControle = new FileSimplementChainee();
 	
-
-	public ArrayList<Double> getDestRover(){
-		return destRover;
-	}
 	
-	public ArrayList<Double> getDestCentreControle(){
-		return destCentreControle;
-	}
 	
 	/**
 	 * Méthode permettant d'envoyer un message vers le centre d'opération
@@ -64,15 +52,18 @@ public class SatelliteRelai extends Thread{
 		lock.lock();
 		
 		try {
+
+			/*
+			 * (5.1) Insérer votre code ici 
+			 */
 			
-			double min = 0;
-			double max = 200;
+	        double nbAleatoire = rand.nextDouble(); // tire un nombre aleatoire entre 0 et 1 
 			
-			double nbAleatoire = min + (max - min) * rand.nextDouble();
-			
+	        //si le nombre est plus grand que la probabilite de perdre le message
 			if(nbAleatoire > PROBABILITE_PERTE_MESSAGE) {
-				destCentreControle.add(nbAleatoire);
+				destCentreControle.ajouterElement(msg);	//on ajoute le message a la file des messages recu du centre de controle
 			}
+			
 			
 		}finally {
 			lock.unlock();
@@ -87,14 +78,16 @@ public class SatelliteRelai extends Thread{
 		lock.lock();
 		
 		try {
+
+			/*
+			 * (5.2) Insérer votre code ici 
+			 */
 			
-			double min = 0;
-			double max = 200;
+			double nbAleatoire = rand.nextDouble(); // tire un nombre aleatoire entre 0 et 1 
 			
-			double nbAleatoire = min + (max - min) * rand.nextDouble();
-			
+	        //si le nombre est plus grand que la probabilite de perdre le message
 			if(nbAleatoire > PROBABILITE_PERTE_MESSAGE) {
-				destRover.add(nbAleatoire);
+				destRover.ajouterElement(msg);	//on ajoute le message a la file des messages recu du rover
 			}
 			
 		}finally {
@@ -107,12 +100,24 @@ public class SatelliteRelai extends Thread{
 		
 		while(true) {
 			
-			if(destRover.size() > 0) {
-				destRover.remove(0);
+			/*
+			 * (5.3) Insérer votre code ici 
+			 */
+			
+			
+			//destRover.afficheFile(destRover);
+			//destCentreControle.afficheFile(destCentreControle);
+			
+			if(destRover.getPremier() != null) {
+				System.out.println(destRover.getPremier() + "---------" + destRover.getNoeudSuivant());
 			}
-			if(destCentreControle.size() > 0) {
-				destCentreControle.remove(0);
-			}
+			
+			
+			System.out.println("Cycle +1");
+			
+			destRover.enleverElement();
+			destCentreControle.enleverElement();
+			
 
 			// attend le prochain cycle
 			try {
@@ -124,13 +129,5 @@ public class SatelliteRelai extends Thread{
 	}
 	
 	
-	public void lierCentrOp(CentreControle centreControle) {
-		
-		this.centreControle = centreControle;
-	}
 
-	public void lierRover(Rover rover) {
-		
-		this.rover = rover;
-	}
 }
