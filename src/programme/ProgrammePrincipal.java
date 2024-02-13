@@ -24,9 +24,15 @@ public class ProgrammePrincipal {
 	public static void main(String[] args){
 	
 		SatelliteRelai satellite = new SatelliteRelai();
+		
+		CentreControle centreControle = new CentreControle(satellite);	//instanciation dun centre de controle
+		Rover rover = new Rover(satellite);								//instanciation dun rover
+		
+		satellite.lierCentreOp(centreControle);							//lier le centre de controle au satellite	
+		satellite.lierRover(rover);										//lier le rover au satellite
+		
 		satellite.start();
 		
-		testSatellite(satellite);
 	}
 	
 	/*
