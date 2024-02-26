@@ -46,7 +46,7 @@ public abstract class TransporteurMessage extends Thread {
 	private ReentrantLock lock = new ReentrantLock();
 	
 	//file simplement chainee des messages envoyees
-	private FileSimplementChainee msgEnvoye = new FileSimplementChainee();
+	protected FileSimplementChainee msgEnvoye = new FileSimplementChainee();
 	
 	//liste des messages recus
 	private ArrayList<Message> msgRecu = new ArrayList<>();
@@ -57,7 +57,12 @@ public abstract class TransporteurMessage extends Thread {
 	 * Constructeur, initialise le compteur de messages unique
 	 */
 	public TransporteurMessage() {
-		compteurMsg = new CompteurMessage();		
+		compteurMsg = new CompteurMessage();
+		
+	}
+	
+	public void setMsgEnvoye(FileSimplementChainee msgEnvoye) {
+	    this.msgEnvoye = msgEnvoye;
 	}
 	
 	/**
@@ -75,12 +80,15 @@ public abstract class TransporteurMessage extends Thread {
 			 * (6.3.3) Insérer votre code ici 
 			 */
 			
+			int posNack = 0;
+			
 			if(msg instanceof Nack) {
 				
-				msgRecu.add(msg);
+				msgRecu.add(0, msg);
+				posNack++;
 			}
 			else {
-				msgRecu.add(msg.getCompte(),msg);
+				msgRecu.add(msg.getCompte() + posNack, msg);
 			}
 			
 			
@@ -113,8 +121,8 @@ public abstract class TransporteurMessage extends Thread {
 				
 				boolean nackEnvoye = false; //verifie si un nack a ete envoye
 				
-				//Boucle tant qu'il y a des messages dans la file *************************Ou est ce que cest dans la liste qu'il faut?
-				while(!msgEnvoye.estVide() && !nackEnvoye) {
+				//Boucle tant qu'il y a des messages dans la liste 
+				while(msgRecu.size() > compteCourant && !nackEnvoye) {
 					
 					//on obtient le prochain message
 					Message message = msgRecu.get(compteCourant);
@@ -123,6 +131,8 @@ public abstract class TransporteurMessage extends Thread {
 					//si le message est un nack
 					if(message instanceof Nack) {
 						
+						System.out.println("je suis un nack ");
+						
 						//obtient le compte du message manquant (cest le compte du message Nack)
 						int compteMsgManquant = message.getCompte();
 						boolean trouver = false;//si on trouve le message manquant ou pas
@@ -130,47 +140,71 @@ public abstract class TransporteurMessage extends Thread {
 						//tant qu'on a pas trouver le message manquant
 						while(!trouver) {
 							
+							// *********** Cette partie marche pas parce que msgEnvoye est vide (cest pas le meme msgEnvoye que dans centreControle)
+							//********************************************************************************************************************
+							
 							//si le compte du message est inferieur au message manquant ou que cest un nack
-							if(msgEnvoye.getPremierMsg().getCompte() < compteMsgManquant || msgEnvoye.getPremierMsg() instanceof Nack) {
+							if(((Message) msgEnvoye.getPremier()).getCompte() < compteMsgManquant || msgEnvoye.getPremier() instanceof Nack) {
 								
 								msgEnvoye.enleverElement(); //on enleve le message de la liste des messages envoyes
 							}
 							//Sinon, si on trouve le message manquant
-							else if(msgEnvoye.getPremierMsg().getCompte() == compteMsgManquant) {
+							else if(((Message) msgEnvoye.getPremier()).getCompte() == compteMsgManquant) {
 								
-								Message msg = msgEnvoye.getPremierMsg(); //peek le message (recuperer le message sans le supprimer)
-								envoyerMessage(msg);					 //envoie le message
-								trouver = true;							 //change la valeur de trouver a vrai pour sortir de la boucle
+								Message msg = (Message) msgEnvoye.getPremier();    	//peek le message (recuperer le message sans le supprimer)
+								envoyerMessage(msg);					 			//envoie le message
+								trouver = true;										//change la valeur de trouver a vrai pour sortir de la boucle
 							}
 						}
 						
 						msgRecu.remove(compteCourant);	//enlever le message de la liste des messages recus
+						
+						
+							//********************************************************************************************************************
 						
 					}
 					
 					//Sinon, si il y a un message manquant
 					else if(message.getCompte() > compteCourant) {
 						
+						System.out.println("Compte du message: " + message.getCompte());
+						System.out.println("Compte courant: " + compteCourant);
+						System.out.println("je suis superieur au compte courant!!");
+						System.out.println("----------------------------------------------");
+						
 						Nack nack = new Nack(compteCourant);	//creer un nack
 						envoyerMessage(nack);					//envoyer le nack 
 						nackEnvoye = true;						//mettre la variable a true et sortir de la boucle
 						
 					}
-					//Sinon, si le compte du message est inferieur au compte courant
+					//Sinon, si le compte du message est inferieur au compte courant1
 					else if(message.getCompte() < compteCourant) {
-						msgRecu.remove(compteCourant);	//enlever le message de la liste des recu **************A VERIFIER
+						
+						System.out.println("Compte du message: " + message.getCompte());
+						System.out.println("Compte courant: " + compteCourant);
+						System.out.println("je suis inferieur au compte courant!!");
+						System.out.println("----------------------------------------------");
+						
+						msgRecu.remove(compteCourant);	//enlever le message de la liste des recu 
 					}
 					//Sinon
 					else {
+						System.out.println("Compte du message: " + message.getCompte());
+						System.out.println("Compte courant: " + compteCourant);
+						System.out.println("je suis egale au compte courant!!");
+						
+						
 						gestionnaireMessage(message);	//faire suivre le message au gestionnaire
 						compteCourant++;				//incremente le compte courant
-														//*********************************il manque a defile le message?????
+						
+						System.out.println("----------------------------------------------");			
+						
+						//*********************************il manque a defile le message?????
 					}
 					
 					NoOp noOp = new NoOp(compteurMsg.getCompteActuel());	// obtient un nouveau compte unique et envoie un NoOp
-							
+					//envoyerMessage(noOp);	
 				}
-				
 				
 			
 			}finally{

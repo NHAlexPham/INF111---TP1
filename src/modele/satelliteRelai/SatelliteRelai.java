@@ -26,7 +26,9 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
+import modele.centreControle.CentreControle;
 import modele.communication.Message;
+import modele.rover.Rover;
 import utilitaires.FileSimplementChainee;
 
 public class SatelliteRelai extends Thread{
@@ -40,6 +42,42 @@ public class SatelliteRelai extends Thread{
 	
 	FileSimplementChainee destRover = new FileSimplementChainee();
 	FileSimplementChainee destCentreControle = new FileSimplementChainee();
+	
+	CentreControle centreControle = new CentreControle(this);
+	Rover rover = new Rover(this);
+	
+	
+	
+	public SatelliteRelai(){
+		
+	}
+	
+	
+	public CentreControle getCentreControle() {
+		return centreControle;
+	}
+	
+	public Rover getRover() {
+		return rover;
+	}
+	
+	
+	/*
+	 * @param centreControle
+	 * permet de lier le centre de controle au satellite
+	 */
+	public void lierCentreOp(CentreControle centreControle) {
+		this.centreControle = centreControle;
+	}
+	
+	/*
+	 * @param Rover
+	 * permet de lier le rover au satellite
+	 */
+	public void lierRover(Rover rover) {
+		this.rover = rover;
+	}
+	
 	
 	
 	
@@ -105,18 +143,22 @@ public class SatelliteRelai extends Thread{
 			 */
 			
 			
-			//destRover.afficheFile(destRover);
-			//destCentreControle.afficheFile(destCentreControle);
+			if(destRover.getNbElements() > 0 && destRover.getObjSuivant() != null) {
+				rover.receptionMessageDeSatellite((Message) destRover.getPremier());
+				rover.receptionMessageDeSatellite((Message) destRover.getObjSuivant());
+				destRover.enleverElement();
+				
+			}
 			
-			if(destRover.getPremier() != null) {
-				System.out.println(destRover.getPremier() + "---------" + destRover.getNoeudSuivant());
+			if(destCentreControle.getNbElements() > 0) {
+				
+				centreControle.receptionMessageDeSatellite((Message) destCentreControle.getPremier());
+				destCentreControle.enleverElement();
+				
 			}
 			
 			
-			System.out.println("Cycle +1");
 			
-			destRover.enleverElement();
-			destCentreControle.enleverElement();
 			
 
 			// attend le prochain cycle
@@ -128,6 +170,6 @@ public class SatelliteRelai extends Thread{
 		}
 	}
 	
-	
+		
 
 }

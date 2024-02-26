@@ -10,7 +10,7 @@ public class Rover extends modele.communication.TransporteurMessage{
 
 	private SatelliteRelai satelliteRelai;
 	private FileSimplementChainee msgEnvoye = new FileSimplementChainee();
-	private ArrayList<Message> msgRecu = new ArrayList<>();
+	//private ArrayList<Message> msgRecu = new ArrayList<>();   *********************sert a rien pour la partie 2
 	
 	public Rover(SatelliteRelai satelliteRelai){
 		
@@ -34,8 +34,7 @@ public class Rover extends modele.communication.TransporteurMessage{
 	@Override
 	protected void gestionnaireMessage(Message msg) {
 		
-		System.out.println(this.getClass().getName() + msg.getCompte());	//affiche le nom de la classe est le numero du message
-		
+		System.out.println("Rover: " + msg.getCompte());	//affiche le nom de la classe est le numero du message
 		
 	}
 

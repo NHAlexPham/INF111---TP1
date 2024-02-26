@@ -7,6 +7,8 @@ import java.util.Random;
 import modele.centreControle.CentreControle;
 import modele.communication.Message;
 import modele.communication.Nack;
+import modele.communication.NoOp;
+import modele.communication.testMessage;
 import modele.rover.Rover;
 import modele.satelliteRelai.SatelliteRelai;
 import utilitaires.FileSimplementChainee;
@@ -30,8 +32,12 @@ public class ProgrammePrincipal {
 		
 		satellite.lierCentreOp(centreControle);							//lier le centre de controle au satellite	
 		satellite.lierRover(rover);										//lier le rover au satellite
+			
 		
+		rover.start();
+		centreControle.start();
 		satellite.start();
+		
 		
 	}
 	
@@ -60,6 +66,12 @@ public class ProgrammePrincipal {
 		vect1.diviser(2);
 		System.out.println(vect1);
 		
+		if(vect1.equals(vect1)) {
+			System.out.println("cest vrai!");
+		}else {
+			System.out.println("cest faux!");
+		}
+		
 		if(vect1.equals(vect3)) {
 			System.out.println("cest vrai!");
 		}else {
@@ -74,6 +86,8 @@ public class ProgrammePrincipal {
 	public static void testFileSimplementChainee() {
 		
 		FileSimplementChainee file = new FileSimplementChainee();
+		
+		Message mess;
 		
 		Nack msg1 = new Nack(1);
 		Nack msg2 = new Nack(2);
@@ -126,7 +140,7 @@ public class ProgrammePrincipal {
 	public static void testSatellite(SatelliteRelai satellite) {
 		
 		for(int i = 0; i < 100; i++) {
-			Nack msg = new Nack(i);
+			testMessage msg = new testMessage(i);
 			satellite.envoyerMessageVersRover(msg);
 			
 		}
