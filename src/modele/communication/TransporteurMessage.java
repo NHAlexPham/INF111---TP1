@@ -33,7 +33,7 @@ package modele.communication;
  * @version Hiver, 2024
  */
 
-import java.util.ArrayList;
+import java.util.PriorityQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
 import utilitaires.FileSimplementChainee;
@@ -42,14 +42,16 @@ public abstract class TransporteurMessage extends Thread {
 	
 	// compteur de message
 	protected CompteurMessage compteurMsg;
+	
 	// lock qui protège la liste de messages reçu
 	private ReentrantLock lock = new ReentrantLock();
 	
 	//file simplement chainee des messages envoyees
 	protected FileSimplementChainee msgEnvoye = new FileSimplementChainee();
 	
-	//liste des messages recus
-	private ArrayList<Message> msgRecu = new ArrayList<>();
+	
+	PriorityQueue<Message> msgRecu = new PriorityQueue<Message>();
+	
 	
 	
 	
@@ -59,10 +61,6 @@ public abstract class TransporteurMessage extends Thread {
 	public TransporteurMessage() {
 		compteurMsg = new CompteurMessage();
 		
-	}
-	
-	public void setMsgEnvoye(FileSimplementChainee msgEnvoye) {
-	    this.msgEnvoye = msgEnvoye;
 	}
 	
 	/**
@@ -79,18 +77,9 @@ public abstract class TransporteurMessage extends Thread {
 			/*
 			 * (6.3.3) Insérer votre code ici 
 			 */
+		
 			
-			int posNack = 0;
-			
-			if(msg instanceof Nack) {
-				
-				msgRecu.add(0, msg);
-				posNack++;
-			}
-			else {
-				msgRecu.add(msg.getCompte() + posNack, msg);
-			}
-			
+			msgRecu.add(msg);
 			
 			
 		}finally {
@@ -104,8 +93,7 @@ public abstract class TransporteurMessage extends Thread {
 	 */
 	public void run() {
 		
-		int compteCourant = 0;
-		CompteurMessage compteurMsg = new CompteurMessage();
+		int compteCourant = 0;			
 		
 		while(true) {
 			
@@ -125,13 +113,19 @@ public abstract class TransporteurMessage extends Thread {
 				while(msgRecu.size() > compteCourant && !nackEnvoye) {
 					
 					//on obtient le prochain message
-					Message message = msgRecu.get(compteCourant);
+					Message message = msgRecu.poll();  			//  on prend le premier element de la liste et on le delete 
 					
 					
 					//si le message est un nack
 					if(message instanceof Nack) {
 						
-						System.out.println("je suis un nack ");
+						System.out.println("*********JE SUIS UN NACK***********");					
+						System.out.println();						
+						System.out.println();
+						System.out.println("Cherche dans la liste des messages envoyee pour renvoyer le message!!");					
+						System.out.println();						
+						System.out.println();
+						
 						
 						//obtient le compte du message manquant (cest le compte du message Nack)
 						int compteMsgManquant = message.getCompte();
@@ -140,25 +134,33 @@ public abstract class TransporteurMessage extends Thread {
 						//tant qu'on a pas trouver le message manquant
 						while(!trouver) {
 							
-							// *********** Cette partie marche pas parce que msgEnvoye est vide (cest pas le meme msgEnvoye que dans centreControle)
+							//*********** tout semble correcte sauf le compte du message, jajoute les messages tjrs au debut de la liste alors ils ne sont pas en ordre croissant, on commence par le dernier, peut etre??
 							//********************************************************************************************************************
 							
 							//si le compte du message est inferieur au message manquant ou que cest un nack
 							if(((Message) msgEnvoye.getPremier()).getCompte() < compteMsgManquant || msgEnvoye.getPremier() instanceof Nack) {
 								
+								System.out.println("message suprime: " + msgEnvoye.getPremier());
+								
 								msgEnvoye.enleverElement(); //on enleve le message de la liste des messages envoyes
+
+								
 							}
 							//Sinon, si on trouve le message manquant
 							else if(((Message) msgEnvoye.getPremier()).getCompte() == compteMsgManquant) {
 								
+								System.out.println("MESSAGE A RENVOYER TROUVE:  " + msgEnvoye.getPremier());
 								Message msg = (Message) msgEnvoye.getPremier();    	//peek le message (recuperer le message sans le supprimer)
 								envoyerMessage(msg);					 			//envoie le message
 								trouver = true;										//change la valeur de trouver a vrai pour sortir de la boucle
 							}
 						}
 						
-						msgRecu.remove(compteCourant);	//enlever le message de la liste des messages recus
+						msgRecu.poll();	//enlever le message de la liste des messages recus 	
+					
 						
+						System.out.println("^^^^^^^^^^^^^ " + this);
+						System.out.println("----------------------------------------------");
 						
 							//********************************************************************************************************************
 						
@@ -168,8 +170,9 @@ public abstract class TransporteurMessage extends Thread {
 					else if(message.getCompte() > compteCourant) {
 						
 						System.out.println("Compte du message: " + message.getCompte());
-						System.out.println("Compte courant: " + compteCourant);
-						System.out.println("je suis superieur au compte courant!!");
+						System.out.println("Compte courant   : " + compteCourant);
+						System.out.println("je suis superieur au compte courant!, envoie un NACK!!");
+						System.out.println("^^^^^^^^^^^^^ " + this);
 						System.out.println("----------------------------------------------");
 						
 						Nack nack = new Nack(compteCourant);	//creer un nack
@@ -177,32 +180,37 @@ public abstract class TransporteurMessage extends Thread {
 						nackEnvoye = true;						//mettre la variable a true et sortir de la boucle
 						
 					}
-					//Sinon, si le compte du message est inferieur au compte courant1
+					//Sinon, si le compte du message est inferieur au compte courant
 					else if(message.getCompte() < compteCourant) {
 						
 						System.out.println("Compte du message: " + message.getCompte());
-						System.out.println("Compte courant: " + compteCourant);
-						System.out.println("je suis inferieur au compte courant!!");
+						System.out.println("Compte courant   : " + compteCourant);
+						System.out.println("je suis inferieur au compte courant, message efface!!");
+						System.out.println("^^^^^^^^^^^^^ " + this);
 						System.out.println("----------------------------------------------");
 						
-						msgRecu.remove(compteCourant);	//enlever le message de la liste des recu 
+						msgRecu.poll();	//enlever le message de la liste des recu 		
 					}
 					//Sinon
 					else {
 						System.out.println("Compte du message: " + message.getCompte());
-						System.out.println("Compte courant: " + compteCourant);
-						System.out.println("je suis egale au compte courant!!");
+						System.out.println("Compte courant   : " + compteCourant);
+						System.out.println("je suis egale au compte courant, message sauvegarde!!");
+						System.out.println("^^^^^^^^^^^^^ " + this);
 						
 						
 						gestionnaireMessage(message);	//faire suivre le message au gestionnaire
+														//manque a defiler le message? si cest necessaire****************
 						compteCourant++;				//incremente le compte courant
 						
 						System.out.println("----------------------------------------------");			
 						
-						//*********************************il manque a defile le message?????
+						
 					}
 					
-					NoOp noOp = new NoOp(compteurMsg.getCompteActuel());	// obtient un nouveau compte unique et envoie un NoOp
+					
+					compteurMsg.getCompteActuel();							// obtient un nouveau compte unique
+					//NoOp noOp = new NoOp(compteurMsg.getCompteActuel());	//envoie un NoOp     ????? A VERIFIER**********
 					//envoyerMessage(noOp);	
 				}
 				
@@ -219,6 +227,15 @@ public abstract class TransporteurMessage extends Thread {
 			}
 		}
 	}
+	
+	
+	public void stockerMsgEnvoye(Message message) {
+		
+		this.msgEnvoye.ajouterElement(message);;
+		
+	}
+	
+	
 
 	/**
 	 * méthode abstraite utilisé pour envoyer un message

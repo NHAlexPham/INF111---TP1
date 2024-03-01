@@ -23,6 +23,7 @@ package modele.satelliteRelai;
  */
 
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -40,8 +41,10 @@ public class SatelliteRelai extends Thread{
 	
 	private Random rand = new Random();
 	
-	FileSimplementChainee destRover = new FileSimplementChainee();
-	FileSimplementChainee destCentreControle = new FileSimplementChainee();
+	
+	PriorityQueue<Message> destRover = new PriorityQueue<Message>();
+	PriorityQueue<Message> destCentreControle = new PriorityQueue<Message>();
+	
 	
 	CentreControle centreControle = new CentreControle(this);
 	Rover rover = new Rover(this);
@@ -99,7 +102,7 @@ public class SatelliteRelai extends Thread{
 			
 	        //si le nombre est plus grand que la probabilite de perdre le message
 			if(nbAleatoire > PROBABILITE_PERTE_MESSAGE) {
-				destCentreControle.ajouterElement(msg);	//on ajoute le message a la file des messages recu du centre de controle
+				destCentreControle.add(msg);	//on ajoute le message au debut de la file des messages recu du centre de controle
 			}
 			
 			
@@ -125,7 +128,7 @@ public class SatelliteRelai extends Thread{
 			
 	        //si le nombre est plus grand que la probabilite de perdre le message
 			if(nbAleatoire > PROBABILITE_PERTE_MESSAGE) {
-				destRover.ajouterElement(msg);	//on ajoute le message a la file des messages recu du rover
+				destRover.add(msg);	//on ajoute le message au debut de la file des messages recu du rover
 			}
 			
 		}finally {
@@ -143,17 +146,15 @@ public class SatelliteRelai extends Thread{
 			 */
 			
 			
-			if(destRover.getNbElements() > 0 && destRover.getObjSuivant() != null) {
-				rover.receptionMessageDeSatellite((Message) destRover.getPremier());
-				rover.receptionMessageDeSatellite((Message) destRover.getObjSuivant());
-				destRover.enleverElement();
+			
+			
+			if(destRover.size() > 0) {
+				rover.receptionMessageDeSatellite((Message) destRover.poll());
 				
 			}
 			
-			if(destCentreControle.getNbElements() > 0) {
-				
-				centreControle.receptionMessageDeSatellite((Message) destCentreControle.getPremier());
-				destCentreControle.enleverElement();
+			if(destCentreControle.size() > 0) {
+				centreControle.receptionMessageDeSatellite((Message) destCentreControle.poll());
 				
 			}
 			

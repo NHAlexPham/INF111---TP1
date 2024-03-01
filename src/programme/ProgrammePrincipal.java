@@ -8,7 +8,7 @@ import modele.centreControle.CentreControle;
 import modele.communication.Message;
 import modele.communication.Nack;
 import modele.communication.NoOp;
-import modele.communication.testMessage;
+import modele.communication.TestMessage;
 import modele.rover.Rover;
 import modele.satelliteRelai.SatelliteRelai;
 import utilitaires.FileSimplementChainee;
@@ -140,9 +140,11 @@ public class ProgrammePrincipal {
 	public static void testSatellite(SatelliteRelai satellite) {
 		
 		for(int i = 0; i < 100; i++) {
-			testMessage msg = new testMessage(i);
+			TestMessage msg = new TestMessage(i);
 			satellite.envoyerMessageVersRover(msg);
 			
 		}
 	}
+	
+	
 }
