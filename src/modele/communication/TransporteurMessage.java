@@ -79,7 +79,7 @@ public abstract class TransporteurMessage extends Thread {
 			 */
 		
 			
-			msgRecu.add(msg);
+			msgRecu.add(msg); //regardez la methode compareTo dans la classe message pour comprendre ou est ce que les messages sont ajouter
 			
 			
 		}finally {
