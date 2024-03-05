@@ -9,8 +9,8 @@ package utilitaires;
  *  - setTempsEnvoi
  *  - getCompte
  * 
- * @author Dyaa , ETS
- * @version hiver, 2024
+ * @author Dyaa Abou Arida, ETS
+ * @version Hiver, 2024
  */
 public class Vect2D {
 
@@ -123,7 +123,6 @@ public class Vect2D {
 		
 		longueurX = longueurX / a;
 		longueurY = longueurY / a;
-		
 	}
 	
 	/*
@@ -154,10 +153,10 @@ public class Vect2D {
 	public boolean equals(Object obj){
 		
 		boolean egaux = false;
-		Vect2D vect2d = new Vect2D();
-		obj = vect2d;
+		Vect2D vect2d = new Vect2D((Vect2D)obj);
 		
-		if(vect2d.getLongueurX() == longueurX && vect2d.getLongueurY() == longueurY) {
+		
+		if(vect2d.getLongueurX() == this.longueurX && vect2d.getLongueurY() == this.longueurY) {
 			egaux = true;
 		}
 		

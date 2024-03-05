@@ -1,8 +1,16 @@
 package programme;
+/**
+ * Programme principale qui sert la simulation du TP
+ * 
+ * 
+ * Services offerts:
+ *  - testVect2D
+ *  - testFileSimplementChainee
 
-import java.io.IOException;
-import java.util.ListIterator;
-import java.util.Random;
+ * 
+ * @author Dyaa Abou Arida, ETS
+ * @version Hiver, 2024
+ */
 
 import modele.centreControle.CentreControle;
 import modele.communication.Message;
@@ -23,10 +31,24 @@ public class ProgrammePrincipal {
 	 */
 	public static void main(String[] args){
 	
-		SatelliteRelai satellite = new SatelliteRelai();
+		SatelliteRelai satellite = new SatelliteRelai();				//creation d'un nouveau Satellite
+		
+		CentreControle centreControle = new CentreControle(satellite);	//instanciation dun centre de controle
+		Rover rover = new Rover(satellite);								//instanciation dun rover
+		
+		satellite.lierCentreOp(centreControle);							//lier le centre de controle au satellite	
+		satellite.lierRover(rover);										//lier le rover au satellite
+			
+		
+		rover.setPositionActuelle(50, 50);								//initialiser la position du rover
+		
+		rover.start();
+		centreControle.start();
 		satellite.start();
 		
-		testSatellite(satellite);
+		centreControle.sequenceTest();									//lancer la sequence de test pour deplacer le rover
+		
+		
 	}
 	
 	/*
@@ -54,6 +76,12 @@ public class ProgrammePrincipal {
 		vect1.diviser(2);
 		System.out.println(vect1);
 		
+		if(vect1.equals(vect1)) {
+			System.out.println("cest vrai!");
+		}else {
+			System.out.println("cest faux!");
+		}
+		
 		if(vect1.equals(vect3)) {
 			System.out.println("cest vrai!");
 		}else {
@@ -68,6 +96,8 @@ public class ProgrammePrincipal {
 	public static void testFileSimplementChainee() {
 		
 		FileSimplementChainee file = new FileSimplementChainee();
+		
+		Message mess;
 		
 		Nack msg1 = new Nack(1);
 		Nack msg2 = new Nack(2);
@@ -117,12 +147,7 @@ public class ProgrammePrincipal {
 		
 	}
 	
-	public static void testSatellite(SatelliteRelai satellite) {
-		
-		for(int i = 0; i < 100; i++) {
-			Nack msg = new Nack(i);
-			satellite.envoyerMessageVersRover(msg);
-			
-		}
-	}
+	
+	
+	
 }

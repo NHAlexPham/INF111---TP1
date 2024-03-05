@@ -15,8 +15,9 @@ package modele.communication;
  * @version Ete, 2021
  */
 
+import java.util.PriorityQueue;
 
-public abstract class Message {
+public abstract class Message implements Comparable<Message>{
 
 	private int compte;
 	private long tempsEnvoi;
@@ -55,5 +56,68 @@ public abstract class Message {
 		return compte;
 	}
 
+	
+	@Override
+	public int compareTo(Message msg) {
+		
+		int compteMsg = msg.getCompte();
+		int val = 0;
+
+		
+		if(msg instanceof Nack) {
+			val = 1;
+		}
+		
+		else if(this instanceof Nack) {
+			val = -1;
+			
+		}
+		else {
+			
+			if(compteMsg < compte) {
+				val = 1;
+			}
+			else if(compteMsg > compte) {
+				val = -1;
+			}
+			else {
+				val = 0;
+			}
+			
+		}
+				
+			
+		
+		return val;
+	} 
+	
+	
+	//main juste pour tester la priority queue  (Ce main ce run independament du programme, il va run juste la classe Message)*****
+	/*
+	public static void main(String[] args) {
+		
+		PriorityQueue<Message> pq = new PriorityQueue<>();
+		
+		TestMessage msg1 = new TestMessage(1);
+		TestMessage msg2 = new TestMessage(2);
+		TestMessage msg5 = new TestMessage(5);
+		TestMessage msg10 = new TestMessage(10);
+		
+		Nack n1 = new Nack(11);
+		Nack n2 = new Nack(12);
+		
+		pq.add(msg5);
+		pq.add(msg10);
+		pq.add(n2);
+		pq.add(msg1);
+		pq.add(msg2);
+		pq.add(n1);
+		
+		while(!pq.isEmpty()) {
+			Message msg = pq.poll();
+			System.out.println(msg.getCompte());
+		}
+	}
+	*/
 	
 }

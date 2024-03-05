@@ -1,8 +1,19 @@
 package utilitaires;
-
-import java.util.ArrayList;
-
-import modele.communication.Message;
+/**
+ * Classe qui définit la File Simplement Chainée
+ * 
+ *
+ * Services offerts:
+ *  - getPremier
+ *  - getNbElements
+ *  - afficheFile
+ *  - ajouterElement
+ *  - enleverElement
+ *  - estVide
+ * 
+ * @author Dyaa Abou Arida, ETS
+ * @version Hiver, 2024
+ */
 
 public class FileSimplementChainee {
 	
@@ -18,17 +29,12 @@ public class FileSimplementChainee {
 	public FileSimplementChainee() {
 	}
 	
-	/*
-	 * retourne le dernier element de la file
-	 */
-	public Noeud getDernier() {
-		return dernier;
-	}
+
 	/*
 	 * retourne le premier element de la file 
 	 */
-	public Noeud getPremier() {
-		return premier;
+	public Object getPremier() {
+		return premier.donnee;
 	}
 	
 	/*
@@ -38,19 +44,17 @@ public class FileSimplementChainee {
 		return nbElements;
 	}
 	
-	public Noeud getNoeudSuivant() {
-		return premier.suivant;
-	}
-	
-	
-	public void afficheFile(FileSimplementChainee file) {
+	/*
+	 * Methode permettant l'affichage de la file 
+	 */
+	public void afficheFile() {
+		int nbAff = nbElements;
 		
-		FileSimplementChainee fileTest = new FileSimplementChainee();
-		fileTest = file;
-		
-		while(fileTest.premier != null) { 
-			System.out.print(fileTest.premier + "-------");
-			fileTest.enleverElement();	
+		while(nbAff > 0) { 
+			System.out.print(premier.donnee + "--");
+			ajouterElement(this.enleverElement());	
+			nbAff --;
+			
 		}
 		System.out.println();
 	}
@@ -59,10 +63,10 @@ public class FileSimplementChainee {
 	 * @param element
 	 * methode qui permet d'ajouter un element a la fin de la file
 	 */
-	public void ajouterElement(Message msg) {
+	public void ajouterElement(Object object) {
 		
-		Noeud nouveau = new Noeud();  	//creation dun nouveau noeud
-		nouveau.msg = msg;				//ajout du message dans le nouveau noeud
+		Noeud nouveau = new Noeud();  			//creation dun nouveau noeud
+		nouveau.donnee = object;				//ajout du message dans le nouveau noeud
 		
 		
 		//Si la file est vide, le premier noeud est le nouveau noeud
@@ -97,17 +101,19 @@ public class FileSimplementChainee {
 	 * @param element
 	 * methode qui permet d'enlever un element a la file
 	 */
-	public void enleverElement() {
-		
+	public Object enleverElement() {
+		Noeud noeud = null;
 		//s'il y a 1 noeud ou plus
 		if(nbElements > 0) {
 			
 			//verifier quil y a un noeud apres pour que le noeud suivant deviens le premier noeud
 			if(premier.suivant != null) {
-				premier = premier.suivant;
+				noeud = premier;
+				premier = premier.suivant;				
 			}
 			//sinon cest le dernier noeud, donc on le supprime
 			else {
+				noeud = premier;
 				premier = null;
 				dernier = null;
 			}
@@ -118,7 +124,6 @@ public class FileSimplementChainee {
 		else if(nbElements == 0) {
 			dernier = null;
 		}
-		
 		
 		
 		//affiche les informations importantes durant les test *****A EFFACER PLUTARD******
@@ -136,6 +141,9 @@ public class FileSimplementChainee {
 		System.out.println("Nombre d'element dans la file:   " + nbElements);
 		System.out.println("______________________________________________________");
 		*/
+		
+		
+		return noeud.donnee;
 	}
 	
 	/*
@@ -161,7 +169,7 @@ public class FileSimplementChainee {
 	//-------------------------------------------------------------------------------------
 	
 	private class Noeud {
-		public Message msg;
+		public Object donnee;
 		public Noeud suivant;
 		
 		/*
@@ -169,10 +177,11 @@ public class FileSimplementChainee {
 		 */
 		@Override
 		public String toString() {
-			return "Message " + msg.getCompte();
+			return "Noeud [donnee=" + donnee + ", suivant=" + suivant + "]";
 		}
 		
-		}
+		
+	}
 	//-------------------------------------------------------------------------------------
 	
 }
