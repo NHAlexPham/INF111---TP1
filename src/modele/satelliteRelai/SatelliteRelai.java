@@ -23,7 +23,6 @@ package modele.satelliteRelai;
  */
 
 import java.util.ArrayList;
-import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -31,6 +30,8 @@ import modele.centreControle.CentreControle;
 import modele.communication.Message;
 import modele.rover.Rover;
 import utilitaires.FileSimplementChainee;
+
+import javax.swing.*;
 
 public class SatelliteRelai extends Thread{
 	
@@ -40,31 +41,12 @@ public class SatelliteRelai extends Thread{
 	ReentrantLock lock = new ReentrantLock();
 	
 	private Random rand = new Random();
-	
-	//Liste des message que le satellite transfert au Rover et au Centre de controle
-	PriorityQueue<Message> destRover = new PriorityQueue<Message>();
-	PriorityQueue<Message> destCentreControle = new PriorityQueue<Message>();
-	
-	
-	CentreControle centreControle = new CentreControle(this);	//creation d'un nouveau centre de controle
-	Rover rover = new Rover(this);								//creation d'un nouveau rover
-	
-	
-	/*
-	 * @param centreControle
-	 * permet de lier le centre de controle au satellite
-	 */
-	public void lierCentreOp(CentreControle centreControle) {
-		this.centreControle = centreControle;
-	}
-	
-	/*
-	 * @param Rover
-	 * permet de lier le rover au satellite
-	 */
-	public void lierRover(Rover rover) {
-		this.rover = rover;
-	}
+
+	private Rover rover;
+	private CentreControle centreControle;
+
+	FileSimplementChainee fileVersRover = new FileSimplementChainee();
+	FileSimplementChainee fileVersCentre = new FileSimplementChainee();
 	
 	
 	/**
@@ -80,22 +62,20 @@ public class SatelliteRelai extends Thread{
 			/*
 			 * (5.1) Insérer votre code ici 
 			 */
-			
-			// tire un nombre aleatoire entre 0 et 1 
-	        double nbAleatoire = rand.nextDouble(); 
-			
-	        //si le nombre est plus grand que la probabilite de perdre le message
-			if(nbAleatoire > PROBABILITE_PERTE_MESSAGE) {
-				
-				destCentreControle.add(msg);	//on ajoute le message au debut de la file des messages recu du centre de controle
+			double randomDouble = rand.nextDouble();
+			if (randomDouble > PROBABILITE_PERTE_MESSAGE){
+				fileVersCentre.ajouterElement(msg);
+				System.out.println("MESSAGE AJOUTER A ... CENTRE FILE");
+				System.out.println("TAILLE FIlE_CENTRE: " + fileVersCentre.getTaille());
+			}else{
+				System.out.println("===OUPS!===");
+				System.out.println("MESSAGE OUPS CENTRE: " + msg + " #"+msg.getCompte());
 			}
-			
 			
 		}finally {
 			lock.unlock();
 		}
 	}
-	
 	
 	/**
 	 * Méthode permettant d'envoyer un message vers le rover
@@ -109,14 +89,14 @@ public class SatelliteRelai extends Thread{
 			/*
 			 * (5.2) Insérer votre code ici 
 			 */
-			
-			// tire un nombre aleatoire entre 0 et 1 
-			double nbAleatoire = rand.nextDouble(); 
-			
-	        //si le nombre est plus grand que la probabilite de perdre le message
-			if(nbAleatoire > PROBABILITE_PERTE_MESSAGE) {
-				
-				destRover.add(msg);	//on ajoute le message au debut de la file des messages recu du rover
+			double randomDouble = rand.nextDouble();
+			if (randomDouble > PROBABILITE_PERTE_MESSAGE){
+				fileVersRover.ajouterElement(msg);
+				System.out.println("MESSAGE AJOUTER A ... ROVER FILE ");
+				System.out.println("TAILLE FIlE_ROVER: " + fileVersRover.getTaille());
+			}else{
+				System.out.println("===OUPS!===");
+				System.out.println("MESSAGE OUPS ROVER: " + msg + " #"+msg.getCompte());
 			}
 			
 		}finally {
@@ -126,27 +106,43 @@ public class SatelliteRelai extends Thread{
 
 	@Override
 	public void run() {
+
+		System.out.println("SATELLITE --> RUN");
+
+		int cycle = 1;
+		boolean run = true;
 		
-		while(true) {
+		while(run) {
 			
 			/*
 			 * (5.3) Insérer votre code ici 
 			 */
-			
-			//s'il y a des messages dans la liste des messages a envoyer au Rover
-			if(destRover.size() > 0) {
-				
-				//le rover ajoute les messages dans sa liste des recus
-				rover.receptionMessageDeSatellite((Message) destRover.poll());	
-			}
-			//s'il y a des messages dans la liste des messages a envoyer au Centre de controle
-			if(destCentreControle.size() > 0) {
-				
-				//le centre de controle ajoute les messages dans sa liste des recus
-				centreControle.receptionMessageDeSatellite((Message) destCentreControle.poll());
-			}
-			
+			System.out.println("Cycles #" + cycle);
 
+			if (!fileVersCentre.estVide()){
+				System.out.println("Satelite ---> Centre....");
+				System.out.println("TAILLE FILE_CENTRE: " + fileVersCentre.getTaille());
+				Message message = (Message) fileVersCentre.enleverElement();
+				System.out.println("PREMIER: " + message);
+				this.centreControle.receptionMessageDeSatellite( message);
+			}else {
+				System.out.println("Satelite ---> Centre ---> FILE VIDE");
+			}
+
+			if (!fileVersRover.estVide()){
+				System.out.println("Satelite ---> Rover....");
+				System.out.println("TAILLE FILE_ROVER: " + fileVersRover.getTaille());
+				Message message = (Message) fileVersRover.enleverElement();
+				System.out.println("PREMIER: " + message);
+				this.rover.receptionMessageDeSatellite( message);
+			}else{
+				System.out.println("Satelite ---> Rover ---> FILE VIDE");
+			}
+
+			if(fileVersRover.estVide() && fileVersCentre.estVide()){
+				//run = false;
+			}
+			cycle++;
 			// attend le prochain cycle
 			try {
 				Thread.sleep(TEMPS_CYCLE_MS);
@@ -155,7 +151,14 @@ public class SatelliteRelai extends Thread{
 			}
 		}
 	}
+
+	public void lierCentrOp(CentreControle centreControle){
+		this.centreControle = centreControle;
+	}
+
+	public void lierRover(Rover rover){
+		this.rover = rover;
+	}
 	
-		
 
 }

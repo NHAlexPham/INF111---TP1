@@ -1,39 +1,23 @@
 package modele.communication;
-/**
- * Classe de base qui définit une Commande de deplacement du Rover.
- * 
- * Ce type de message contient les informations utiles dans le rover utilisera pour se deplacer.
- * 
- * @author Dyaa Abou Arida, ETS
- * @version Hiver, 2024
- */
 
 import utilitaires.Vect2D;
 
-public class CmdDeplacerRover extends Commande{
-	
-	private eCommande eCom;				//type de commande pour le rover
-	private Vect2D	destination;		//Destination pour le rover
+public class CmdDeplacerRover extends Commande {
 
-	public CmdDeplacerRover(int compte, Vect2D destination) {
-		super(compte);
+    private Vect2D vect2D;
+    /**
+     * Constructeur, requiert un compte unique pour identifier sa position dans
+     * la séquence de messages envoyés
+     *
+     * @param compte
+     * @param eCommande
+     */
+    public CmdDeplacerRover(int compte, modele.communication.eCommande eCommande, Vect2D vect2D) {
+        super(compte, eCommande);
+        this.vect2D = vect2D;
+    }
 
-		this.destination = destination;
-		this.eCom = eCommande.DEPLACER_ROVER;
-	}
-	
-	/*
-	 * retourne le type de commande du message
-	 */
-	public eCommande getECom() {
-		return eCom;
-	}
-	
-	/*
-	 * retourne la destination inclus dans ce message
-	 */
-	public Vect2D getDestination() {
-		return destination;
-	}
-
+    public Vect2D getVect2D() {
+        return vect2D;
+    }
 }

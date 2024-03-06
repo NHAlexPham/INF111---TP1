@@ -1,27 +1,21 @@
 package modele.communication;
-/**
- * Classe de base qui définit une Commande.
- * 
- * Permet au centre de controle d'envoyer un message avec une commande spécifique.
- * 
- * @author Dyaa Abou Arida, ETS
- * @version Hiver, 2024
- */
 
 public class Commande extends Message{
-	
-	private eCommande eCom;	
 
-	public Commande(int compte) {
-		super(compte);
-		
-	}
-	
-	/*
-	 * methode qui retourne le type de commande du message
-	 */
-	public eCommande getECom() {
-		return eCom;
-	}
+    eCommande eCommande;
 
+    /**
+     * Constructeur, requiert un compte unique pour identifier sa position dans
+     * la séquence de messages envoyés
+     *
+     * @param compte
+     */
+    public Commande(int compte, eCommande eCommande) {
+        super(compte);
+        this.eCommande = eCommande;
+    }
+
+    public modele.communication.eCommande geteCommande() {
+        return eCommande;
+    }
 }

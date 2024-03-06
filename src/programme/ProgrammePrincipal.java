@@ -1,26 +1,15 @@
 package programme;
-/**
- * Programme principale qui sert la simulation du TP
- * 
- * 
- * Services offerts:
- *  - testVect2D
- *  - testFileSimplementChainee
 
- * 
- * @author Dyaa Abou Arida, ETS
- * @version Hiver, 2024
- */
+import java.io.IOException;
 
+import Testing.TestMessage;
 import modele.centreControle.CentreControle;
+import modele.communication.CompteurMessage;
 import modele.communication.Message;
-import modele.communication.Nack;
 import modele.rover.Rover;
 import modele.satelliteRelai.SatelliteRelai;
 import utilitaires.FileSimplementChainee;
 import utilitaires.Vect2D;
-
-
 
 public class ProgrammePrincipal {
 
@@ -30,124 +19,173 @@ public class ProgrammePrincipal {
 	 * @param args, pas utilisé
 	 */
 	public static void main(String[] args){
-	
-		SatelliteRelai satellite = new SatelliteRelai();				//creation d'un nouveau Satellite
-		
-		CentreControle centreControle = new CentreControle(satellite);	//instanciation dun centre de controle
-		Rover rover = new Rover(satellite);								//instanciation dun rover
-		
-		satellite.lierCentreOp(centreControle);							//lier le centre de controle au satellite	
-		satellite.lierRover(rover);										//lier le rover au satellite
-			
-		
-		rover.setPositionActuelle(50, 50);								//initialiser la position du rover
-		
+		//testVect2D();
+		//testFileSimplementChainee();
+		//testNooPNack();
+		//testSatelite();
+		start();
+	}
+
+	/**
+	 *
+	 */
+	private static void testNooPNack() {
+		int max = 5;
+
+		SatelliteRelai satellite = new SatelliteRelai();
+		Vect2D vect2D = new Vect2D(50,50);
+		Rover rover = new Rover(satellite,vect2D);
+		CentreControle centreControle = new CentreControle(satellite);
+
+		satellite.lierCentrOp(centreControle);
+		satellite.lierRover(rover);
+
+		CompteurMessage cpt = new CompteurMessage();
+
+		for (int i = 0; i < max; i++) {
+			Message message = new TestMessage(cpt.getCompteActuel(),"Message #"+i);
+			centreControle.testMessage(message);
+		}
+
 		rover.start();
 		centreControle.start();
 		satellite.start();
-		
-		centreControle.sequenceTest();									//lancer la sequence de test pour deplacer le rover
-		
-		
 	}
-	
+
+	/**
+	 *
+	 */
+	public static void start() {
+		SatelliteRelai satellite = new SatelliteRelai();
+		Vect2D vect2D = new Vect2D(50,50);
+		Rover rover = new Rover(satellite,vect2D);
+		CentreControle centreControle = new CentreControle(satellite);
+
+		satellite.lierCentrOp(centreControle);
+		satellite.lierRover(rover);
+
+		rover.start();
+		centreControle.start();
+		satellite.start();
+
+		centreControle.sequenceTest();
+	}
+
+	/**
+	 *
+	 */
+	public static void testSatelite(){
+		SatelliteRelai satellite = new SatelliteRelai();
+
+		CompteurMessage cpt = new CompteurMessage();
+
+		TestMessage ct1 = new TestMessage(cpt.getCompteActuel(),"Houston");
+		TestMessage ct2 = new TestMessage(cpt.getCompteActuel(),"Nous Avons");
+		TestMessage ct3 = new TestMessage(cpt.getCompteActuel(),"Un probleme");
+
+		TestMessage r1 = new TestMessage(cpt.getCompteActuel(),"Allo la Terre");
+		TestMessage r2 = new TestMessage(cpt.getCompteActuel(),"Je veux une pizza");
+		TestMessage r3 = new TestMessage(cpt.getCompteActuel(),"Coucou");
+
+		satellite.envoyerMessageVersCentrOp(r1);
+		satellite.envoyerMessageVersCentrOp(r2);
+		satellite.envoyerMessageVersCentrOp(r3);
+
+		satellite.envoyerMessageVersRover(ct1);
+		satellite.envoyerMessageVersRover(ct2);
+		satellite.envoyerMessageVersRover(ct3);
+
+		satellite.start();
+	}
+
+	/**
+	 *
+	 */
+	public static void testFileSimplementChainee() {
+		//
+		FileSimplementChainee file = new FileSimplementChainee();
+
+		// Object
+		Integer d1 = new Integer(1);
+		Integer d2 = new Integer(2);
+		Integer d3 = new Integer(3);
+		Integer d4 = new Integer(4);
+		Integer d5 = new Integer(5);
+
+		file.ajouterElement(d1);
+		file.ajouterElement(d2);
+		file.ajouterElement(d3);
+
+		System.out.println("Taille: " + file.getTaille());
+
+		file.afficher();
+
+		System.out.println("Taille: " + file.getTaille());
+
+		System.out.println("Premier: " + file.getPremier());
+		System.out.println("Dernier: " + file.getDernier());
+
+		Object o = file.enleverElement();
+		System.out.println("Defile: " + o.toString());
+
+
+		System.out.println("Taille: " + file.getTaille());
+
+		file.afficher();
+
+		file.ajouterElement(d4);
+		file.ajouterElement(d5);
+
+		System.out.println("Taille: " + file.getTaille());
+
+		file.afficher();
+
+		o = file.enleverElement();
+		System.out.println("Defile: " + o.toString());
+
+		file.afficher();
+
+		System.out.println("Taille: " + file.getTaille());
+		file.enleverElement();
+		file.enleverElement();
+		file.enleverElement();
+
+		System.out.println("Taille: " + file.getTaille());
+		file.enleverElement();
+		System.out.println("Taille: " + file.getTaille());
+		file.enleverElement();
+		System.out.println("Taille: " + file.getTaille());
+	}
+
 	/*
 	 * methode de test pour la classe de Vect2D
 	 */
 	public static void testVect2D() {
-		
-		Vect2D vect1 = new Vect2D();
-		Vect2D vect2 = new Vect2D(12, 34);
-		
-		vect1.setLongueurX(10);
-		vect1.setLongueurY(21);
-		
-		Vect2D vect3 = new Vect2D(vect1);
-		
-		vect1.ajouter(4, 6);
-		System.out.println("vect3 en x" + vect3.getLongueurX());
-		System.out.println("vect3 en y" + vect3.getLongueurY());
-		
-		System.out.println(vect2);
-		
-		System.out.println("longueur vect 2" + vect2.getLongueur());
-		System.out.println("angle vect 2" +vect2.getAngle());
-		
-		vect1.diviser(2);
-		System.out.println(vect1);
-		
-		if(vect1.equals(vect1)) {
-			System.out.println("cest vrai!");
-		}else {
-			System.out.println("cest faux!");
-		}
-		
-		if(vect1.equals(vect3)) {
-			System.out.println("cest vrai!");
-		}else {
-			System.out.println("cest faux!");
-		}
-		
+		// Ct vide
+		Vect2D vect2D1 = new Vect2D();
+		// Ct double, double
+		Vect2D vect2D2 = new Vect2D(25.5,25.3);
+		// Ct copie
+		Vect2D vect2D3 = new Vect2D(vect2D2);
+
+		// Methode a tester:
+		// calculerDiff
+		// diviser
+		// ajouter
+		// getAngle
+
+		System.out.println("L'angle du vecteur est : "+ vect2D2.getAngle());
+
+		vect2D1.ajouter(50.35,25);
+
+		Vect2D vect = vect2D1.calculerDiff(vect2D2);
+
+		System.out.println("Vect resultant: " + vect);
+
+		vect2D2.diviser(3.25);
+
+		System.out.println("Vect resultant: " + vect2D2);
+
 	}
 
-	/*
-	 * methode de test pour la classe FileSimplementChainee
-	 */
-	public static void testFileSimplementChainee() {
-		
-		FileSimplementChainee file = new FileSimplementChainee();
-		
-		Message mess;
-		
-		Nack msg1 = new Nack(1);
-		Nack msg2 = new Nack(2);
-		Nack msg3 = new Nack(3);
-		Nack msg4 = new Nack(4);
-		Nack msg5 = new Nack(5);
-		
-		System.out.println("La vide est vide?  " + file.estVide());
-		System.out.println("Nombre d'element dans la file:   " + file.getNbElements());
-		System.out.println("______________________________________________________");
-		
-		System.out.println("On ajoute Message 1");
-		file.ajouterElement(msg1);
-
-		System.out.println("On ajoute Message 2");
-		file.ajouterElement(msg2);
-		
-		System.out.println("On ajoute Message 3");
-		file.ajouterElement(msg3);
-		
-		System.out.println("On ajoute Message 4");
-		file.ajouterElement(msg4);
-		
-		System.out.println("On ajoute Message 5");
-		file.ajouterElement(msg5);
-		
-		System.out.println("On enleve le premier element");
-		file.enleverElement();
-		
-		System.out.println("On enleve le premier element");
-		file.enleverElement();
-		
-		System.out.println("On enleve le premier element");
-		file.enleverElement();
-		
-		System.out.println("On enleve le premier element");
-		file.enleverElement();
-		
-		System.out.println("On enleve le premier element");
-		file.enleverElement();
-		
-		System.out.println("On ajoute Message 2");
-		file.ajouterElement(msg2);
-		
-		System.out.println("On ajoute Message 5");
-		file.ajouterElement(msg5);
-		
-	}
-	
-	
-	
-	
 }
