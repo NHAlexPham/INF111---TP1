@@ -59,12 +59,10 @@ public class CentreControle extends TransporteurMessage {
     }
 
     private void gestionnaireCommande(Message message){
-        if(message instanceof Status){
-            System.out.println("===========================================");
-            System.out.println("STATUS --> RECU");
-            System.out.println("POSITION DU ROVER: X: " + ((Status) message).getVect2D().getLongueurX() +
-                    ", Y: " + ((Status) message).getVect2D().getLongueurY());
-            System.out.println("===========================================");
-        }
+        System.out.println("===========================================");
+        System.out.println("STATUS --> RECU");
+        System.out.println("POSITION DU ROVER: X: " + ((Status) message).getVect2D().getLongueurX() +
+                ", Y: " + ((Status) message).getVect2D().getLongueurY());
+        System.out.println("===========================================");
     }
 }
